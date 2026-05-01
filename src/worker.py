@@ -169,8 +169,8 @@ class MspaintWorkflow(WorkflowEntrypoint):
             result = generate_mspaint
             response = result["response"]
 
-            # OpenAI image response: { data: [{ b64_json: "..." }] }
-            image_b64 = response["data"][0]["b64_json"]
+            # Workers AI binding returns { image: "base64string" }
+            image_b64 = response["image"]
             image_bytes = base64.b64decode(image_b64)
 
             output_key = image_key.replace("photos/", "mspaintified/")
