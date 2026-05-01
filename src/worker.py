@@ -69,7 +69,7 @@ async def list_photos(request: Request):
             {
                 "key": obj.key,
                 "size": obj.size,
-                "uploaded": obj.uploaded.isoformat(),
+                "uploaded": obj.uploaded.toISOString(),
                 "etag": obj.httpEtag,
             }
         )
