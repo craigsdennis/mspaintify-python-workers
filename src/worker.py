@@ -151,7 +151,7 @@ class MspaintWorkflow(WorkflowEntrypoint):
                 "openai/gpt-image-2",
                 {
                     "prompt": PROMPT,
-                    "image": data_uri,
+                    "images": [data_uri],
                 },
                 {
                     "gateway": {"id": "default"},
