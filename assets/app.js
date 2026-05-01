@@ -13,6 +13,8 @@ const copyUrlBtn = document.getElementById('copyUrl');
 const errorDiv = document.getElementById('error');
 const refreshGalleryBtn = document.getElementById('refreshGallery');
 const galleryGrid = document.getElementById('galleryGrid');
+const refreshMspaintifiedBtn = document.getElementById('refreshMspaintified');
+const mspaintifiedGrid = document.getElementById('mspaintifiedGrid');
 
 let stream = null;
 let capturedBlob = null;
@@ -114,6 +116,7 @@ uploadCaptureBtn.addEventListener('click', () => {
 
 // Gallery
 refreshGalleryBtn.addEventListener('click', loadGallery);
+refreshMspaintifiedBtn.addEventListener('click', loadMspaintified);
 
 async function loadGallery() {
   galleryGrid.innerHTML = '<p>Loading...</p>';
@@ -141,11 +144,50 @@ async function loadGallery() {
           <div>${(photo.size / 1024).toFixed(1)} KB</div>
           <div>${new Date(photo.uploaded).toLocaleString()}</div>
         </div>
+        <button class="mspaintify-btn" data-key="${photo.key}">🎨 MSPaintify</button>
       `;
+      item.querySelector('.mspaintify-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        mspaintify(photo.key, item);
+      });
       galleryGrid.appendChild(item);
     }
   } catch (err) {
     galleryGrid.innerHTML = `<p style="color:#c00">${err.message}</p>`;
+  }
+}
+
+async function loadMspaintified() {
+  mspaintifiedGrid.innerHTML = '<p>Loading...</p>';
+  try {
+    const res = await fetch('/api/photos?prefix=mspaintified/');
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to load mspaintified images');
+    }
+
+    mspaintifiedGrid.innerHTML = '';
+    if (!data.photos || data.photos.length === 0) {
+      mspaintifiedGrid.innerHTML = '<p>No mspaintified images yet.</p>';
+      return;
+    }
+
+    for (const photo of data.photos) {
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      const url = `/api/photos/${photo.key}`;
+      item.innerHTML = `
+        <img src="${url}" alt="${photo.key}" loading="lazy">
+        <div class="meta">
+          <div>${(photo.size / 1024).toFixed(1)} KB</div>
+          <div>${new Date(photo.uploaded).toLocaleString()}</div>
+        </div>
+      `;
+      mspaintifiedGrid.appendChild(item);
+    }
+  } catch (err) {
+    mspaintifiedGrid.innerHTML = `<p style="color:#c00">${err.message}</p>`;
   }
 }
 
@@ -173,4 +215,36 @@ function showError(msg) {
 
 function hideError() {
   errorDiv.classList.add('hidden');
+}
+
+async function mspaintify(key, itemEl) {
+  const btn = itemEl.querySelector('.mspaintify-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  try {
+    const res = await fetch(`/api/mspaintify/${encodeURIComponent(key)}`, { method: 'POST' });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'MSPaintify failed');
+    }
+
+    btn.textContent = 'Done! Check MSPaintified tab';
+    btn.style.background = '#27ae60';
+    setTimeout(() => {
+      btn.textContent = '🎨 MSPaintify';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+  } catch (err) {
+    btn.textContent = 'Error - try again';
+    btn.style.background = '#c0392b';
+    setTimeout(() => {
+      btn.textContent = '🎨 MSPaintify';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+    showError(err.message);
+  }
 }

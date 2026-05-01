@@ -61,7 +61,8 @@ async def list_photos(request: Request):
     env = request.scope["env"]
     bucket = env.MY_BUCKET
 
-    listed = await bucket.list(prefix="photos/")
+    prefix = request.query_params.get("prefix", "photos/")
+    listed = await bucket.list(prefix=prefix)
     photos = []
     for obj in listed.objects:
         photos.append(
