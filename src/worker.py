@@ -184,10 +184,12 @@ class MspaintWorkflow(WorkflowEntrypoint):
             # Fetch the image from the presigned URL
             fetch_response = await js.fetch(image_url)
             if not fetch_response.ok:
-                raise ValueError(f"Failed to fetch generated image: {fetch_response.status}")
+                err_text = str(await fetch_response.text())
+                raise ValueError(f"Failed to fetch generated image: {fetch_response.status} {err_text}")
 
-            image_buffer = await fetch_response.arrayBuffer()
-            image_bytes = image_buffer.to_bytes()
+            buffer = await fetch_response.arrayBuffer()
+            # Convert using the same Uint8Array pattern as get_photo
+            image_bytes = bytes(js.Uint8Array.new(buffer))
 
             output_key = image_key.replace("photos/", "mspaintified/")
             if output_key == image_key:
