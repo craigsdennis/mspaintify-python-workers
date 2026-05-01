@@ -1,0 +1,18 @@
+# Virtual environments
+.venv
+.venv-*
+
+# Node.js
+node_modules/
+
+# Wrangler
+.wrangler/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+python_modules/
