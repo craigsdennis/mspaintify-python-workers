@@ -4,7 +4,8 @@
 	"main": "src/worker.py",
 	"compatibility_date": "2026-04-30",
 	"compatibility_flags": [
-		"python_workers"
+		"python_workers",
+		"python_workflows"
 	],
 	"assets": {
 		"directory": "./assets/",
@@ -14,6 +15,16 @@
 		{
 			"binding": "MY_BUCKET",
 			"bucket_name": "mspaint-photos"
+		}
+	],
+	"ai": {
+		"binding": "AI"
+	},
+	"workflows": [
+		{
+			"name": "mspaint-workflow",
+			"binding": "MSPAINT_WORKFLOW",
+			"class_name": "MspaintWorkflow"
 		}
 	],
 	"observability": {
