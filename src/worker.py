@@ -105,14 +105,17 @@ async def get_photo(request: Request, key: str):
 async def mspaintify(request: Request, key: str):
     env = request.scope["env"]
 
-    options = to_js({"params": {"image_key": key}})
+    # Ensure the key is fully decoded (encodeURIComponent in frontend may encode /)
+    image_key = urllib.parse.unquote(key)
+
+    options = to_js({"params": {"image_key": image_key}})
     instance = await env.MSPAINT_WORKFLOW.create(options)
 
     return JSONResponse(
         {
             "workflow_id": instance.id,
             "status": "started",
-            "image_key": key,
+            "image_key": image_key,
         }
     )
 
@@ -126,7 +129,7 @@ class MspaintWorkflow(WorkflowEntrypoint):
         @step.do("read_image")
         async def read_image():
             obj = await env.MY_BUCKET.get(image_key)
-            if obj is None:
+            if not obj:
                 raise ValueError(f"Image not found: {image_key}")
 
             buffer = await obj.arrayBuffer()
