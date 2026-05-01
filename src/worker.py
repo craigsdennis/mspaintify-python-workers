@@ -158,8 +158,17 @@ class MspaintWorkflow(WorkflowEntrypoint):
                 },
             )
 
+            # Convert JsProxy response to plain Python dict for RPC serialization
+            plain_response = {
+                "state": response["state"],
+                "result": {
+                    "image": response["result"]["image"]
+                },
+                "gatewayMetadata": dict(response["gatewayMetadata"]),
+            }
+
             return {
-                "response": response,
+                "response": plain_response,
                 "ext": image_data["ext"],
                 "content_type": image_data["content_type"],
             }
