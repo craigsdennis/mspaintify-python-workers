@@ -83,7 +83,7 @@ async def get_photo(request: Request, key: str):
     bucket = env.MY_BUCKET
 
     obj = await bucket.get(key)
-    if obj is None:
+    if not obj:
         return JSONResponse({"error": "Not found"}, status_code=404)
 
     # writeHttpMetadata requires a JS Headers object
@@ -154,7 +154,7 @@ class MspaintWorkflow(WorkflowEntrypoint):
                     "images": [data_uri],
                 },
                 {
-                    "gateway": {"id": "default"},
+                    "gateway": {"id": "mspaintify"},
                 },
             )
 
