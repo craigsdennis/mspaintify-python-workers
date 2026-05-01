@@ -169,9 +169,16 @@ class MspaintWorkflow(WorkflowEntrypoint):
             result = generate_mspaint
             response = result["response"]
 
-            # Workers AI binding returns { image: "base64string" }
-            image_b64 = response["image"]
-            image_bytes = base64.b64decode(image_b64)
+            # AI Gateway returns a presigned URL to the generated image
+            image_url = response["result"]["image"]
+
+            # Fetch the image from the presigned URL
+            fetch_response = await js.fetch(image_url)
+            if not fetch_response.ok:
+                raise ValueError(f"Failed to fetch generated image: {fetch_response.status}")
+
+            image_buffer = await fetch_response.arrayBuffer()
+            image_bytes = image_buffer.to_bytes()
 
             output_key = image_key.replace("photos/", "mspaintified/")
             if output_key == image_key:
