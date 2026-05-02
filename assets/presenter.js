@@ -20,13 +20,18 @@ const afterImg = document.getElementById('afterImg');
 const photoCount = document.getElementById('photoCount');
 const statusText = document.getElementById('statusText');
 
+// Init - start centered, move to corner when photos arrive
+if (mspaintifiedPhotos.length === 0) {
+  qrSection.classList.add('centered');
+}
+
 // Generate QR code on load
 function initQR() {
   const captureUrl = window.location.origin + '/capture.html';
   new QRCode(document.getElementById('qrcode'), {
     text: captureUrl,
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
     colorDark: '#000000',
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M,
@@ -54,7 +59,7 @@ async function pollPhotos() {
 
       if (!hadPhotos) {
         // First photo arrived!
-        qrSection.classList.add('has-photos');
+        qrSection.classList.remove('centered');
         slideshowEmpty.classList.add('hidden');
         startSlideshow();
       }

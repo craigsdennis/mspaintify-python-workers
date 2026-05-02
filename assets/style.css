@@ -81,23 +81,39 @@ body.presenter {
 }
 
 .qr-section {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-  transition: opacity 0.5s, transform 0.5s;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100;
+  transition: all 0.5s ease;
 }
 
-.qr-section.has-photos {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.5);
-  pointer-events: none;
+.qr-section.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  bottom: auto;
+  transform: translate(-50%, -50%) scale(1.5);
+}
+
+.qr-section.centered .qr-label {
+  font-size: 1.8rem;
+  display: block;
+}
+
+.qr-section:not(.centered) {
+  transform: scale(0.6);
+  transform-origin: bottom left;
+}
+
+.qr-section:not(.centered) .qr-label {
+  font-size: 0.9rem;
+  display: none;
 }
 
 .qr-box {
   background: var(--color-white);
-  padding: 30px;
+  padding: 20px;
   border: 6px solid var(--color-black);
   border-radius: 20px;
   box-shadow: 10px 10px 0px var(--color-red), 20px 20px 0px var(--color-yellow);
@@ -106,7 +122,7 @@ body.presenter {
 }
 
 #qrcode {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 #qrcode img, #qrcode canvas {
@@ -115,11 +131,12 @@ body.presenter {
 }
 
 .qr-label {
-  font-size: 1.8rem;
+  font-size: 1.2rem;
   color: var(--color-black);
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
+  transition: all 0.3s;
 }
 
 .slideshow-section {
