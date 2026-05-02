@@ -65,7 +65,7 @@ async function pollPhotos() {
       }
 
       photoCount.textContent = mspaintifiedPhotos.length;
-      statusText.textContent = `${mspaintifiedPhotos.length} photos terrible-ized`;
+      statusText.textContent = `${mspaintifiedPhotos.length} photos slopped`;
     }
   } catch (err) {
     console.error('Poll error:', err);

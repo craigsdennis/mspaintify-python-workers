@@ -223,7 +223,7 @@ async function mspaintify(key, itemEl) {
   btn.textContent = 'Processing...';
 
   try {
-    const res = await fetch(`/api/mspaintify/${encodeURIComponent(key)}`, { method: 'POST' });
+    const res = await fetch(`/api/mspaintify/${key}`, { method: 'POST' });
     const data = await res.json();
 
     if (!res.ok) {

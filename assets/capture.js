@@ -13,7 +13,7 @@ const cameraView = document.querySelector('.camera-view');
 const previewView = document.getElementById('previewView');
 const previewImg = document.getElementById('previewImg');
 const retakeBtn = document.getElementById('retakeBtn');
-const makeTerribleBtn = document.getElementById('makeTerribleBtn');
+const makeSlopBtn = document.getElementById('makeSlopBtn');
 const processingView = document.getElementById('processingView');
 const progressFill = document.getElementById('progressFill');
 const typewriterContainer = document.getElementById('typewriterContainer');
@@ -172,7 +172,7 @@ async function pollWorkflow(originalKey) {
 
         // Check if mspaintified version exists
         const mspaintKey = originalKey.replace('photos/', 'mspaintified/');
-        const res = await fetch(`${API_BASE}/api/photos/${encodeURIComponent(mspaintKey)}`);
+        const res = await fetch(`${API_BASE}/api/photos/${mspaintKey}`);
 
         if (res.ok) {
           // It's done!
@@ -246,7 +246,7 @@ retakeBtn.addEventListener('click', () => {
   previewView.classList.add('hidden');
   cameraView.classList.remove('hidden');
 });
-makeTerribleBtn.addEventListener('click', uploadAndProcess);
+makeSlopBtn.addEventListener('click', uploadAndProcess);
 againBtn.addEventListener('click', reset);
 retryBtn.addEventListener('click', reset);
 
