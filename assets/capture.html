@@ -51,9 +51,10 @@
     <!-- Processing View -->
     <div class="processing-view hidden" id="processingView">
       <div class="processing-content">
-        <div class="spinner"></div>
-        <h2>Sending to AI...</h2>
-        <p class="processing-steps" id="processingSteps">Uploading photo</p>
+        <h2>&#9889; Processing at the edge</h2>
+        <div class="typewriter-container" id="typewriterContainer">
+          <div class="typewriter-line active" id="typewriterLine"></div>
+        </div>
         <div class="progress-bar">
           <div class="progress-fill" id="progressFill"></div>
         </div>
@@ -65,8 +66,8 @@
       <div class="result-header">
         <h2>It's terrible! <span class="emoji">&#128525;</span></h2>
       </div>
-      
-      <div class="result-comparison">
+
+      <div class="result-comparison" id="resultComparison">
         <div class="result-photo">
           <div class="result-label">Before</div>
           <img id="resultBefore" src="" alt="Before">
@@ -76,9 +77,9 @@
           <img id="resultAfter" src="" alt="After">
         </div>
       </div>
-      
+
       <p class="result-message">Check the big screen to see your terrible photo!</p>
-      
+
       <button class="btn-again" id="againBtn">Make Another Terrible Photo</button>
     </div>
 

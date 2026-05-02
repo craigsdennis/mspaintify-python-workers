@@ -16,7 +16,7 @@ const retakeBtn = document.getElementById('retakeBtn');
 const makeTerribleBtn = document.getElementById('makeTerribleBtn');
 const processingView = document.getElementById('processingView');
 const progressFill = document.getElementById('progressFill');
-const processingSteps = document.getElementById('processingSteps');
+const typewriterLine = document.getElementById('typewriterLine');
 const resultView = document.getElementById('resultView');
 const resultBefore = document.getElementById('resultBefore');
 const resultAfter = document.getElementById('resultAfter');
@@ -28,6 +28,24 @@ const retryBtn = document.getElementById('retryBtn');
 let stream = null;
 let capturedBlob = null;
 let workflowId = null;
+let typewriterInterval = null;
+
+// Cloudflare Workers selling points for the typewriter
+const SELLING_POINTS = [
+  "Cloudflare Workers runs your code at the edge, close to your users...",
+  "Python Workers are powered by Pyodide, compiling Python to WebAssembly...",
+  "That means you can write Python that executes in 300+ cities worldwide!",
+  "We're using Python Workflows, a brand new primitive...",
+  "Workflows give you durable execution with automatic retries...",
+  "Each step in the DAG can run for up to 15 minutes!",
+  "AI Gateway gives you one unified bill for all your AI providers...",
+  "We're routing through Cloudflare's AI Gateway to OpenAI's GPT Image model...",
+  "No API keys to manage, just one bill from Cloudflare!",
+  "Workers KV, D1, R2, Durable Objects, Queues, Workflows...",
+  "All available in Python, TypeScript, Rust, Go, and more...",
+  "Check out workers.cloudflare.com to learn more!",
+  "Almost done... ✨"
+];
 
 // Start camera immediately (front-facing / selfie)
 async function startCamera() {
@@ -56,13 +74,63 @@ function capturePhoto() {
   }, 'image/jpeg', 0.9);
 }
 
+// Typewriter effect for selling points
+function startTypewriter() {
+  let messageIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  let currentText = '';
+
+  typewriterLine.textContent = '';
+
+  function type() {
+    const currentMessage = SELLING_POINTS[messageIndex];
+
+    if (isDeleting) {
+      currentText = currentMessage.substring(0, charIndex - 1);
+      charIndex--;
+    } else {
+      currentText = currentMessage.substring(0, charIndex + 1);
+      charIndex++;
+    }
+
+    typewriterLine.textContent = currentText;
+
+    let typeSpeed = isDeleting ? 20 : 40;
+
+    if (!isDeleting && charIndex === currentMessage.length) {
+      // Finished typing this message, pause then delete
+      typeSpeed = 2000;
+      isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+      // Finished deleting, move to next message
+      isDeleting = false;
+      messageIndex = (messageIndex + 1) % SELLING_POINTS.length;
+      typeSpeed = 500;
+    }
+
+    typewriterInterval = setTimeout(type, typeSpeed);
+  }
+
+  type();
+}
+
+function stopTypewriter() {
+  if (typewriterInterval) {
+    clearTimeout(typewriterInterval);
+    typewriterInterval = null;
+  }
+}
+
 // Upload and start workflow
 async function uploadAndProcess() {
   if (!capturedBlob) return;
 
   previewView.classList.add('hidden');
   processingView.classList.remove('hidden');
-  updateProgress(10, 'Uploading photo...');
+
+  startTypewriter();
+  updateProgress(10);
 
   const formData = new FormData();
   formData.append('file', new File([capturedBlob], 'capture.jpg', { type: 'image/jpeg' }));
@@ -79,32 +147,29 @@ async function uploadAndProcess() {
     }
 
     workflowId = data.workflow_id;
-    updateProgress(30, 'Photo uploaded!');
+    updateProgress(30);
 
     // Poll for workflow completion
     await pollWorkflow(data.key);
 
   } catch (err) {
+    stopTypewriter();
     showError(err.message);
   }
 }
 
 // Poll workflow status
 async function pollWorkflow(originalKey) {
-  const steps = [
-    { progress: 40, text: 'Reading your photo...' },
-    { progress: 60, text: 'Asking GPT to make it terrible...' },
-    { progress: 80, text: 'Saving the terrible result...' },
-  ];
-  let stepIndex = 0;
+  const progressSteps = [40, 55, 70, 85, 95];
+  let progressIndex = 0;
 
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       try {
-        // Advance the fake progress steps
-        if (stepIndex < steps.length) {
-          updateProgress(steps[stepIndex].progress, steps[stepIndex].text);
-          stepIndex++;
+        // Advance progress
+        if (progressIndex < progressSteps.length) {
+          updateProgress(progressSteps[progressIndex]);
+          progressIndex++;
         }
 
         // Check if mspaintified version exists
@@ -114,30 +179,31 @@ async function pollWorkflow(originalKey) {
         if (res.ok) {
           // It's done!
           clearInterval(interval);
-          updateProgress(100, 'Done!');
+          stopTypewriter();
+          updateProgress(100);
 
           setTimeout(() => {
             showResult(originalKey, mspaintKey);
             resolve();
-          }, 500);
+          }, 800);
         }
       } catch (err) {
         // Keep polling
       }
-    }, 2000);
+    }, 2500);
 
     // Timeout after 2 minutes
     setTimeout(() => {
       clearInterval(interval);
+      stopTypewriter();
       reject(new Error('Taking too long... Check the big screen later!'));
     }, 120000);
   });
 }
 
 // Update progress UI
-function updateProgress(percent, text) {
+function updateProgress(percent) {
   progressFill.style.width = percent + '%';
-  if (text) processingSteps.textContent = text;
 }
 
 // Show final result
@@ -164,7 +230,8 @@ function reset() {
   previewImg.src = '';
   resultBefore.src = '';
   resultAfter.src = '';
-  updateProgress(0, 'Uploading photo');
+  updateProgress(0);
+  stopTypewriter();
 
   errorView.classList.add('hidden');
   resultView.classList.add('hidden');

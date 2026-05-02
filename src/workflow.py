@@ -106,4 +106,5 @@ class MspaintWorkflow(WorkflowEntrypoint):
 
         # Execute the DAG by awaiting the final step.
         # The framework resolves dependencies via parameter names.
-        return await save_result()
+        result = await save_result()
+        return to_js(result)
