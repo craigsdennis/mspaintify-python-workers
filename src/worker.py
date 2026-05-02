@@ -39,9 +39,15 @@ async def upload_photo(request: Request, file: UploadFile = File(...)):
         customMetadata={"filename": file.filename or "unknown"},
     )
 
+    # Auto-trigger the MSPaintify workflow
+    options = to_js({"params": {"image_key": key}})
+    workflow_instance = await env.MSPAINT_WORKFLOW.create(options)
+
     return JSONResponse(
         {
             "key": key,
+            "workflow_id": workflow_instance.id,
+            "status": "processing",
             "filename": file.filename,
             "content_type": file.content_type,
             "size": len(content),
@@ -94,11 +100,17 @@ async def get_photo(request: Request, key: str):
     return Response(content=body_bytes, headers=headers)
 
 
+@app.get("/api/workflow-status/{workflow_id}")
+async def workflow_status(request: Request, workflow_id: str):
+    env = request.scope["env"]
+    instance = await env.MSPAINT_WORKFLOW.get(workflow_id)
+    status = await instance.status()
+    return {"status": status, "workflow_id": workflow_id}
+
+
 @app.post("/api/mspaintify/{key:path}")
 async def mspaintify(request: Request, key: str):
     env = request.scope["env"]
-
-    # Ensure the key is fully decoded (encodeURIComponent in frontend may encode /)
     image_key = urllib.parse.unquote(key)
 
     options = to_js({"params": {"image_key": image_key}})

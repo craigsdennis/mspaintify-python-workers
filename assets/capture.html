@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>MSPaintify - Make It Terrible!</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="capture">
+  <div class="capture-container">
+    <!-- Camera View -->
+    <div class="camera-view" id="cameraView">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" hidden></canvas>
+      
+      <div class="capture-overlay">
+        <div class="capture-header">
+          <h2>MSPaintify</h2>
+          <p>Make your photo terrible!</p>
+        </div>
+        
+        <button class="shutter-btn" id="shutterBtn">
+          <div class="shutter-inner"></div>
+        </button>
+        
+        <p class="capture-hint">Tap to capture</p>
+      </div>
+    </div>
+
+    <!-- Preview View -->
+    <div class="preview-view hidden" id="previewView">
+      <div class="preview-header">
+        <h2>Looking good!</h2>
+      </div>
+      
+      <div class="preview-image-container">
+        <img id="previewImg" src="" alt="Preview">
+      </div>
+      
+      <div class="preview-actions">
+        <button class="btn-retake" id="retakeBtn">Retake</button>
+        <button class="btn-terrible" id="makeTerribleBtn">
+          <span class="sparkle">&#10024;</span>
+          Make It Terrible!
+          <span class="sparkle">&#10024;</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Processing View -->
+    <div class="processing-view hidden" id="processingView">
+      <div class="processing-content">
+        <div class="spinner"></div>
+        <h2>Sending to AI...</h2>
+        <p class="processing-steps" id="processingSteps">Uploading photo</p>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result View -->
+    <div class="result-view hidden" id="resultView">
+      <div class="result-header">
+        <h2>It's terrible! <span class="emoji">&#128525;</span></h2>
+      </div>
+      
+      <div class="result-comparison">
+        <div class="result-photo">
+          <div class="result-label">Before</div>
+          <img id="resultBefore" src="" alt="Before">
+        </div>
+        <div class="result-photo">
+          <div class="result-label">After</div>
+          <img id="resultAfter" src="" alt="After">
+        </div>
+      </div>
+      
+      <p class="result-message">Check the big screen to see your terrible photo!</p>
+      
+      <button class="btn-again" id="againBtn">Make Another Terrible Photo</button>
+    </div>
+
+    <!-- Error View -->
+    <div class="error-view hidden" id="errorView">
+      <div class="error-content">
+        <div class="error-icon">&#128546;</div>
+        <h2>Oops!</h2>
+        <p id="errorText">Something went wrong</p>
+        <button class="btn-again" id="retryBtn">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/capture.js"></script>
+</body>
+</html>

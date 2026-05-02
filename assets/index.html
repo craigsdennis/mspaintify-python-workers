@@ -3,60 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photo Upload</title>
+  <title>MSPaintify @ PyCon</title>
   <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>Photo Upload</h1>
+<body class="presenter">
+  <div class="presenter-container">
+    <header class="presenter-header">
+      <h1>MSPaintify</h1>
+      <div class="counter">
+        <span id="photoCount">0</span> photos terrible-ized
+      </div>
+    </header>
 
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="upload">Upload File</button>
-      <button class="tab-btn" data-tab="camera">Take Photo</button>
-      <button class="tab-btn" data-tab="gallery">Gallery</button>
-      <button class="tab-btn" data-tab="mspaintified">MSPaintified</button>
-    </div>
-
-    <div id="upload" class="tab-panel active">
-      <div class="drop-zone" id="dropZone">
-        <p>Drag & drop a photo here or click to browse</p>
-        <input type="file" id="fileInput" accept="image/*" hidden>
+    <div class="qr-section">
+      <div class="qr-box">
+        <div id="qrcode"></div>
+        <p class="qr-label">Scan to make your photo terrible!</p>
       </div>
     </div>
 
-    <div id="camera" class="tab-panel">
-      <div class="camera-wrapper">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas" hidden></canvas>
-        <div class="camera-controls">
-          <button id="startCamera">Start Camera</button>
-          <button id="snapPhoto" hidden>Take Photo</button>
-          <button id="retakePhoto" hidden>Retake</button>
-          <button id="uploadCapture" hidden>Upload Photo</button>
+    <div class="slideshow-section">
+      <div class="slideshow-pair" id="slideshowPair">
+        <div class="photo-frame before">
+          <div class="label">BEFORE</div>
+          <img id="beforeImg" src="" alt="Before">
+        </div>
+        <div class="photo-frame after">
+          <div class="label">AFTER</div>
+          <img id="afterImg" src="" alt="After">
+        </div>
+      </div>
+      <div class="slideshow-empty" id="slideshowEmpty">
+        <div class="empty-content">
+          <div class="paint-icon"></div>
+          <p>Waiting for the first brave soul...</p>
+          <p class="sub">Scan the QR code to get started!</p>
         </div>
       </div>
     </div>
 
-    <div id="gallery" class="tab-panel">
-      <button id="refreshGallery" class="refresh-btn">Refresh</button>
-      <div id="galleryGrid" class="gallery-grid"></div>
+    <div class="status-bar" id="statusBar">
+      <span class="status-dot"></span>
+      <span id="statusText">Waiting for photos...</span>
     </div>
-
-    <div id="mspaintified" class="tab-panel">
-      <button id="refreshMspaintified" class="refresh-btn">Refresh</button>
-      <div id="mspaintifiedGrid" class="gallery-grid"></div>
-    </div>
-
-    <div id="result" class="result hidden">
-      <h3>Upload Complete!</h3>
-      <img id="preview" src="" alt="Preview">
-      <p id="resultText"></p>
-      <button id="copyUrl">Copy URL</button>
-    </div>
-
-    <div id="error" class="error hidden"></div>
   </div>
 
-  <script src="/app.js"></script>
+  <script src="/presenter.js"></script>
 </body>
 </html>
