@@ -16,7 +16,7 @@ const retakeBtn = document.getElementById('retakeBtn');
 const makeTerribleBtn = document.getElementById('makeTerribleBtn');
 const processingView = document.getElementById('processingView');
 const progressFill = document.getElementById('progressFill');
-const typewriterLine = document.getElementById('typewriterLine');
+const typewriterContainer = document.getElementById('typewriterContainer');
 const resultView = document.getElementById('resultView');
 const resultBefore = document.getElementById('resultBefore');
 const resultAfter = document.getElementById('resultAfter');
@@ -28,9 +28,9 @@ const retryBtn = document.getElementById('retryBtn');
 let stream = null;
 let capturedBlob = null;
 let workflowId = null;
-let typewriterInterval = null;
+let typewriterTimeout = null;
 
-// Cloudflare Workers selling points for the typewriter
+// Cloudflare Workers selling points
 const SELLING_POINTS = [
   "Cloudflare Workers runs your code at the edge, close to your users...",
   "Python Workers are powered by Pyodide, compiling Python to WebAssembly...",
@@ -74,51 +74,49 @@ function capturePhoto() {
   }, 'image/jpeg', 0.9);
 }
 
-// Typewriter effect for selling points
+// Typewriter that accumulates lines
 function startTypewriter() {
+  typewriterContainer.innerHTML = '';
   let messageIndex = 0;
   let charIndex = 0;
-  let isDeleting = false;
-  let currentText = '';
+  let currentLine = null;
 
-  typewriterLine.textContent = '';
+  function typeNextChar() {
+    if (messageIndex >= SELLING_POINTS.length) return;
 
-  function type() {
-    const currentMessage = SELLING_POINTS[messageIndex];
+    const message = SELLING_POINTS[messageIndex];
 
-    if (isDeleting) {
-      currentText = currentMessage.substring(0, charIndex - 1);
-      charIndex--;
+    // Create a new line element when starting a message
+    if (charIndex === 0) {
+      currentLine = document.createElement('div');
+      currentLine.className = 'typewriter-line';
+      typewriterContainer.appendChild(currentLine);
+      // Scroll to bottom
+      typewriterContainer.scrollTop = typewriterContainer.scrollHeight;
+    }
+
+    // Type one character
+    currentLine.textContent = message.substring(0, charIndex + 1);
+    charIndex++;
+
+    if (charIndex < message.length) {
+      // Continue typing this message
+      typewriterTimeout = setTimeout(typeNextChar, 30);
     } else {
-      currentText = currentMessage.substring(0, charIndex + 1);
-      charIndex++;
+      // Finished this message, start next after pause
+      charIndex = 0;
+      messageIndex++;
+      typewriterTimeout = setTimeout(typeNextChar, 1500);
     }
-
-    typewriterLine.textContent = currentText;
-
-    let typeSpeed = isDeleting ? 20 : 40;
-
-    if (!isDeleting && charIndex === currentMessage.length) {
-      // Finished typing this message, pause then delete
-      typeSpeed = 2000;
-      isDeleting = true;
-    } else if (isDeleting && charIndex === 0) {
-      // Finished deleting, move to next message
-      isDeleting = false;
-      messageIndex = (messageIndex + 1) % SELLING_POINTS.length;
-      typeSpeed = 500;
-    }
-
-    typewriterInterval = setTimeout(type, typeSpeed);
   }
 
-  type();
+  typeNextChar();
 }
 
 function stopTypewriter() {
-  if (typewriterInterval) {
-    clearTimeout(typewriterInterval);
-    typewriterInterval = null;
+  if (typewriterTimeout) {
+    clearTimeout(typewriterTimeout);
+    typewriterTimeout = null;
   }
 }
 

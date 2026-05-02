@@ -516,28 +516,37 @@ body.capture {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   width: 100%;
   max-width: 600px;
-  padding: 0 20px;
+  padding: 20px;
   margin: 20px 0;
+  overflow-y: auto;
+  gap: 12px;
 }
 
 .typewriter-line {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.5;
   color: var(--color-lime);
   text-align: center;
-  min-height: 3.2em;
   max-width: 100%;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
 }
 
-.typewriter-line.active::after {
+.typewriter-line:last-child::after {
   content: '|';
   animation: blink 1s infinite;
   color: var(--color-lime);
+  margin-left: 2px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes blink {
