@@ -100,6 +100,44 @@ function nextSlide() {
   showSlide(currentSlide + 1);
 }
 
+// Go to previous slide
+function prevSlide() {
+  showSlide(currentSlide - 1 + mspaintifiedPhotos.length);
+}
+
+// Keyboard controls
+function handleKeydown(e) {
+  if (mspaintifiedPhotos.length === 0) return;
+
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    // Stop auto-slideshow so manual control takes over
+    if (slideshowTimer) {
+      clearInterval(slideshowTimer);
+      slideshowTimer = null;
+    }
+    nextSlide();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (slideshowTimer) {
+      clearInterval(slideshowTimer);
+      slideshowTimer = null;
+    }
+    prevSlide();
+  } else if (e.key === ' ') {
+    // Space to toggle auto-slideshow
+    e.preventDefault();
+    if (slideshowTimer) {
+      clearInterval(slideshowTimer);
+      slideshowTimer = null;
+    } else {
+      slideshowTimer = setInterval(nextSlide, SLIDE_INTERVAL);
+    }
+  }
+}
+
+document.addEventListener('keydown', handleKeydown);
+
 // Init
 initQR();
 pollPhotos();
