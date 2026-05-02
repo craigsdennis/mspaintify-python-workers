@@ -20,6 +20,7 @@ const typewriterContainer = document.getElementById('typewriterContainer');
 const resultView = document.getElementById('resultView');
 const resultBefore = document.getElementById('resultBefore');
 const resultAfter = document.getElementById('resultAfter');
+const shareBtn = document.getElementById('shareBtn');
 const againBtn = document.getElementById('againBtn');
 const errorView = document.getElementById('errorView');
 const errorText = document.getElementById('errorText');
@@ -213,6 +214,53 @@ function showResult(beforeKey, afterKey) {
   resultAfter.src = `${API_BASE}/api/photos/${afterKey}`;
 }
 
+// Share photos using Web Share API
+async function sharePhotos() {
+  if (!navigator.canShare) {
+    alert('Sharing not supported on this device');
+    return;
+  }
+
+  try {
+    shareBtn.disabled = true;
+    shareBtn.textContent = 'Loading...';
+
+    // Fetch both images as blobs
+    const [beforeRes, afterRes] = await Promise.all([
+      fetch(resultBefore.src),
+      fetch(resultAfter.src)
+    ]);
+
+    const [beforeBlob, afterBlob] = await Promise.all([
+      beforeRes.blob(),
+      afterRes.blob()
+    ]);
+
+    const beforeFile = new File([beforeBlob], 'before.jpg', { type: 'image/jpeg' });
+    const afterFile = new File([afterBlob], 'slop.jpg', { type: 'image/jpeg' });
+
+    const shareData = {
+      title: 'My MSPaintify Slop',
+      text: 'Check out my photo turned into MS Paint slop! 🎨',
+      files: [beforeFile, afterFile]
+    };
+
+    if (navigator.canShare(shareData)) {
+      await navigator.share(shareData);
+      shareBtn.textContent = '✅ Shared!';
+    } else {
+      alert('Sharing files not supported on this device');
+      shareBtn.disabled = false;
+      shareBtn.textContent = '📤 Share My Slop';
+    }
+  } catch (err) {
+    // User cancelled or error
+    console.log('Share cancelled or failed:', err);
+    shareBtn.disabled = false;
+    shareBtn.textContent = '📤 Share My Slop';
+  }
+}
+
 // Show error
 function showError(msg) {
   processingView.classList.add('hidden');
@@ -240,6 +288,11 @@ function reset() {
   if (!stream) startCamera();
 }
 
+// Check if Web Share API is supported
+if (!navigator.share || !navigator.canShare) {
+  document.body.classList.add('no-share');
+}
+
 // Event listeners
 shutterBtn.addEventListener('click', capturePhoto);
 retakeBtn.addEventListener('click', () => {
@@ -247,6 +300,7 @@ retakeBtn.addEventListener('click', () => {
   cameraView.classList.remove('hidden');
 });
 makeSlopBtn.addEventListener('click', uploadAndProcess);
+shareBtn.addEventListener('click', sharePhotos);
 againBtn.addEventListener('click', reset);
 retryBtn.addEventListener('click', reset);
 

@@ -16,6 +16,7 @@
   --color-lime: #00ff00;
   --color-purple: #9400d3;
   --color-red: #ff0000;
+  --color-blue: #0080ff;
   --color-white: #ffffff;
   --color-black: #000000;
 }
@@ -606,7 +607,6 @@ body.capture {
 .btn-again {
   background: var(--color-lime);
   color: var(--color-black);
-  margin: 0 20px 30px;
   box-shadow: 5px 5px 0px var(--color-purple);
 }
 
@@ -631,8 +631,39 @@ body.capture {
   margin-bottom: 15px;
 }
 
-.error-content p {
-  font-size: 1.2rem;
-  color: var(--color-pink);
-  margin-bottom: 30px;
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 20px 30px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.btn-share {
+  background: linear-gradient(45deg, var(--color-cyan), var(--color-blue));
+  color: var(--color-black);
+  font-size: 1.3rem;
+  box-shadow: 5px 5px 0px var(--color-purple);
+  padding: 15px 30px;
+  border: 4px solid var(--color-black);
+  border-radius: 15px;
+  font-family: var(--font-silly);
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-share:active {
+  transform: scale(0.95);
+}
+
+.btn-share:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Hide share button if not supported */
+.no-share .btn-share {
+  display: none;
 }
