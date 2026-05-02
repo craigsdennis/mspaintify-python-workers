@@ -11,6 +11,7 @@ PROMPT = (
     "It should be vaguely similar but also not really, kind of matching but also off in a confusing, "
     "awkward way, with that low-quality pixel-by-pixel feel that really emphasizes how ridiculously bad it is. "
     "Actually, you know what, whatever, just draw it however you want."
+    "And add a 🧡 PyCon US 2026 on the lower right of the image"
 )
 
 

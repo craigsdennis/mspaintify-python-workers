@@ -34,6 +34,7 @@ let typewriterTimeout = null;
 // Cloudflare Workers selling points
 const SELLING_POINTS = [
   "Cloudflare Workers runs your code at the edge, close to your users...",
+  "You just deploy to region:earth...",
   "Python Workers are powered by Pyodide, compiling Python to WebAssembly...",
   "That means you can write Python that executes in 300+ cities worldwide!",
   "We're using Python Workflows, a brand new primitive...",
@@ -43,7 +44,7 @@ const SELLING_POINTS = [
   "We're routing through Cloudflare's AI Gateway to OpenAI's GPT Image model...",
   "No API keys to manage, just one bill from Cloudflare!",
   "Workers KV, D1, R2, Durable Objects, Queues, Workflows...",
-  "All available in Python, TypeScript, Rust, Go, and more...",
+  "All available in Python...",
   "Check out workers.cloudflare.com to learn more!",
   "Almost done... ✨"
 ];
@@ -241,7 +242,7 @@ async function sharePhotos() {
 
     const shareData = {
       title: 'My MSPaintify Slop',
-      text: 'Check out my photo turned into MS Paint slop! 🎨',
+      text: 'I mspaintified at PyCon 2026. Check out my slop 🧡',
       files: [beforeFile, afterFile]
     };
 
