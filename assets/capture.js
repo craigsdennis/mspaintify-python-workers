@@ -29,11 +29,11 @@ let stream = null;
 let capturedBlob = null;
 let workflowId = null;
 
-// Start camera immediately
+// Start camera immediately (front-facing / selfie)
 async function startCamera() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment' }
+      video: { facingMode: 'user' }
     });
     video.srcObject = stream;
   } catch (err) {
