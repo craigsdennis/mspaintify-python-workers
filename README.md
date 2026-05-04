@@ -36,3 +36,5 @@ Then visit:
 - [Pyodide](https://pyodide.org/) — Python in the browser (and in Workers!)
 - [Workflows Python](https://developers.cloudflare.com/workflows/python/)
 - [AI Gateway — GPT-Image-2](https://developers.cloudflare.com/ai/models/openai/gpt-image-2/)
+- [Workers KV](https://developers.cloudflare.com/workers/platform/storage-options/#workers-kv)
+- [Cloudflare R2](https://developers.cloudflare.com/r2/)
