@@ -1,4 +1,5 @@
 import js
+import json
 import urllib.parse
 import uuid
 
@@ -17,6 +18,27 @@ def to_js(obj):
     return _to_js(obj, dict_converter=js.Object.fromEntries)
 
 
+def get_event_prefix(request: Request) -> str:
+    """Get the R2 key prefix for the current event slug."""
+    event = request.query_params.get("event", "default")
+    return f"{event}/"
+
+
+@app.get("/api/config")
+async def get_config(request: Request):
+    env = request.scope["env"]
+    event = request.query_params.get("event", "default")
+
+    config_json = await env.CONFIG.get(event)
+    if not config_json:
+        return JSONResponse(
+            {"error": f"No config found for event: {event}"}, status_code=404
+        )
+
+    config = json.loads(config_json)
+    return {"event": event, **config}
+
+
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
@@ -26,9 +48,10 @@ async def health():
 async def upload_photo(request: Request, file: UploadFile = File(...)):
     env = request.scope["env"]
     bucket = env.MY_BUCKET
+    prefix = get_event_prefix(request)
 
     ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
-    key = f"photos/{uuid.uuid4()}.{ext}"
+    key = f"{prefix}photos/{uuid.uuid4()}.{ext}"
 
     content = await file.read()
 
@@ -40,7 +63,8 @@ async def upload_photo(request: Request, file: UploadFile = File(...)):
     )
 
     # Auto-trigger the MSPaintify workflow
-    options = to_js({"params": {"image_key": key}})
+    event = request.query_params.get("event", "default")
+    options = to_js({"params": {"image_key": key, "event_slug": event}})
     workflow_instance = await env.MSPAINT_WORKFLOW.create(options)
 
     return JSONResponse(
@@ -59,9 +83,15 @@ async def upload_photo(request: Request, file: UploadFile = File(...)):
 async def list_photos(request: Request):
     env = request.scope["env"]
     bucket = env.MY_BUCKET
+    prefix = get_event_prefix(request)
+    list_type = request.query_params.get("type", "photos")
 
-    prefix = request.query_params.get("prefix", "photos/")
-    listed = await bucket.list(prefix=prefix)
+    if list_type == "mspaintified":
+        list_prefix = f"{prefix}mspaintified/"
+    else:
+        list_prefix = f"{prefix}photos/"
+
+    listed = await bucket.list(prefix=list_prefix)
     photos = []
     for obj in listed.objects:
         photos.append(
@@ -73,7 +103,7 @@ async def list_photos(request: Request):
             }
         )
 
-    return {"photos": photos, "truncated": listed.truncated}
+    return {"photos": photos, "truncated": listed.truncated, "type": list_type}
 
 
 @app.get("/api/photos/{key:path}")
@@ -112,8 +142,9 @@ async def workflow_status(request: Request, workflow_id: str):
 async def mspaintify(request: Request, key: str):
     env = request.scope["env"]
     image_key = urllib.parse.unquote(key)
+    event = request.query_params.get("event", "default")
 
-    options = to_js({"params": {"image_key": image_key}})
+    options = to_js({"params": {"image_key": image_key, "event_slug": event}})
     instance = await env.MSPAINT_WORKFLOW.create(options)
 
     return JSONResponse(

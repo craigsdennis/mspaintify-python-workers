@@ -3,6 +3,9 @@
 // Camera, upload, workflow polling
 // ========================================
 
+const urlParams = new URLSearchParams(window.location.search);
+const EVENT_SLUG = urlParams.get('event') || 'default';
+
 const API_BASE = '';
 
 // DOM refs
@@ -17,6 +20,7 @@ const makeSlopBtn = document.getElementById('makeSlopBtn');
 const processingView = document.getElementById('processingView');
 const progressFill = document.getElementById('progressFill');
 const typewriterContainer = document.getElementById('typewriterContainer');
+const processingTitle = processingView.querySelector('h2');
 const resultView = document.getElementById('resultView');
 const resultBefore = document.getElementById('resultBefore');
 const resultAfter = document.getElementById('resultAfter');
@@ -25,11 +29,15 @@ const againBtn = document.getElementById('againBtn');
 const errorView = document.getElementById('errorView');
 const errorText = document.getElementById('errorText');
 const retryBtn = document.getElementById('retryBtn');
+const pageTitle = document.querySelector('title');
+const captureHeaderH2 = document.querySelector('.capture-header h2');
+const captureHeaderP = document.querySelector('.capture-header p');
 
 let stream = null;
 let capturedBlob = null;
 let workflowId = null;
 let typewriterTimeout = null;
+let eventConfig = null;
 
 // Cloudflare Workers selling points
 const SELLING_POINTS = [
@@ -48,6 +56,26 @@ const SELLING_POINTS = [
   "Check out workers.cloudflare.com to learn more!",
   "Almost done... ✨"
 ];
+
+// Fetch event config
+async function initEvent() {
+  try {
+    const res = await fetch(`${API_BASE}/api/config?event=${EVENT_SLUG}`);
+    if (res.ok) {
+      eventConfig = await res.json();
+      const title = eventConfig.title || 'MSPaintify';
+      pageTitle.textContent = title;
+      captureHeaderH2.textContent = title;
+      processingTitle.textContent = title;
+    } else {
+      console.warn('No config found for event:', EVENT_SLUG);
+    }
+  } catch (err) {
+    console.error('Failed to load config:', err);
+  }
+
+  startCamera();
+}
 
 // Start camera immediately (front-facing / selfie)
 async function startCamera() {
@@ -136,7 +164,7 @@ async function uploadAndProcess() {
   formData.append('file', new File([capturedBlob], 'capture.jpg', { type: 'image/jpeg' }));
 
   try {
-    const res = await fetch(`${API_BASE}/api/upload`, {
+    const res = await fetch(`${API_BASE}/api/upload?event=${EVENT_SLUG}`, {
       method: 'POST',
       body: formData,
     });
@@ -173,7 +201,7 @@ async function pollWorkflow(originalKey) {
         }
 
         // Check if mspaintified version exists
-        const mspaintKey = originalKey.replace('photos/', 'mspaintified/');
+        const mspaintKey = originalKey.replace(`${EVENT_SLUG}/photos/`, `${EVENT_SLUG}/mspaintified/`);
         const res = await fetch(`${API_BASE}/api/photos/${mspaintKey}`);
 
         if (res.ok) {
@@ -240,9 +268,10 @@ async function sharePhotos() {
     const beforeFile = new File([beforeBlob], 'before.jpg', { type: 'image/jpeg' });
     const afterFile = new File([afterBlob], 'slop.jpg', { type: 'image/jpeg' });
 
+    const title = eventConfig?.title || 'MSPaintify';
     const shareData = {
       title: 'My MSPaintify Slop',
-      text: 'I mspaintified at PyCon 2026. Check out my slop 🧡',
+      text: `I mspaintified at ${title}. Check out my slop 🧡`,
       files: [beforeFile, afterFile]
     };
 
@@ -306,4 +335,4 @@ againBtn.addEventListener('click', reset);
 retryBtn.addEventListener('click', reset);
 
 // Start on load
-startCamera();
+initEvent();

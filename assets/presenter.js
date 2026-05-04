@@ -7,9 +7,13 @@ const API_BASE = '';
 const POLL_INTERVAL = 3000;
 const SLIDE_INTERVAL = 5000;
 
+const urlParams = new URLSearchParams(window.location.search);
+const EVENT_SLUG = urlParams.get('event') || 'default';
+
 let mspaintifiedPhotos = [];
 let currentSlide = 0;
 let slideshowTimer = null;
+let eventConfig = null;
 
 // DOM refs
 const qrSection = document.querySelector('.qr-section');
@@ -19,15 +23,42 @@ const beforeImg = document.getElementById('beforeImg');
 const afterImg = document.getElementById('afterImg');
 const photoCount = document.getElementById('photoCount');
 const statusText = document.getElementById('statusText');
+const pageTitle = document.querySelector('title');
+const pageHeader = document.querySelector('.presenter-header h1');
+const qrLabel = document.querySelector('.qr-label');
 
 // Init - start centered, move to corner when photos arrive
 if (mspaintifiedPhotos.length === 0) {
   qrSection.classList.add('centered');
 }
 
+// Fetch event config and initialize
+async function initEvent() {
+  try {
+    const res = await fetch(`${API_BASE}/api/config?event=${EVENT_SLUG}`);
+    if (res.ok) {
+      eventConfig = await res.json();
+      const title = eventConfig.title || 'MSPaintify';
+      pageTitle.textContent = title;
+      pageHeader.textContent = title;
+      if (eventConfig.title) {
+        qrLabel.textContent = `MSPaintify yourself at ${title}!`;
+      }
+    } else {
+      console.warn('No config found for event:', EVENT_SLUG);
+    }
+  } catch (err) {
+    console.error('Failed to load config:', err);
+  }
+
+  initQR();
+  pollPhotos();
+  setInterval(pollPhotos, POLL_INTERVAL);
+}
+
 // Generate QR code on load
 function initQR() {
-  const captureUrl = window.location.origin + '/capture.html';
+  const captureUrl = `${window.location.origin}/capture.html?event=${EVENT_SLUG}`;
   new QRCode(document.getElementById('qrcode'), {
     text: captureUrl,
     width: 180,
@@ -41,7 +72,7 @@ function initQR() {
 // Poll for new mspaintified photos
 async function pollPhotos() {
   try {
-    const res = await fetch(`${API_BASE}/api/photos?prefix=mspaintified/`);
+    const res = await fetch(`${API_BASE}/api/photos?event=${EVENT_SLUG}&type=mspaintified`);
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.error);
@@ -50,7 +81,7 @@ async function pollPhotos() {
       // Map mspaintified keys back to original keys
       const newPhotos = data.photos.map(photo => ({
         afterKey: photo.key,
-        beforeKey: photo.key.replace('mspaintified/', 'photos/'),
+        beforeKey: photo.key.replace(`${EVENT_SLUG}/mspaintified/`, `${EVENT_SLUG}/photos/`),
       }));
 
       // Check if we have new photos
@@ -139,6 +170,4 @@ function handleKeydown(e) {
 document.addEventListener('keydown', handleKeydown);
 
 // Init
-initQR();
-pollPhotos();
-setInterval(pollPhotos, POLL_INTERVAL);
+initEvent();

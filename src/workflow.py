@@ -5,13 +5,12 @@ import uuid
 from pyodide.ffi import to_js as _to_js
 from workers import WorkflowEntrypoint
 
-PROMPT = (
+BASE_PROMPT = (
     "Redraw the attached image in the most clumsy, scribbly, and utterly pathetic way possible. "
     "Use a white background, and make it look like it was drawn in MS Paint with a mouse. "
     "It should be vaguely similar but also not really, kind of matching but also off in a confusing, "
     "awkward way, with that low-quality pixel-by-pixel feel that really emphasizes how ridiculously bad it is. "
     "Actually, you know what, whatever, just draw it however you want."
-    "And add a 🧡 PyCon US 2026 on the lower right of the image"
 )
 
 
@@ -23,7 +22,16 @@ class MspaintWorkflow(WorkflowEntrypoint):
     async def run(self, event, step):
         payload = event["payload"]
         image_key = payload["image_key"]
+        event_slug = payload.get("event_slug", "default")
         env = self.env
+
+        @step.do("load_config")
+        async def load_config():
+            config_json = await env.CONFIG.get(event_slug)
+            if config_json:
+                import json
+                return json.loads(config_json)
+            return {}
 
         @step.do("read_image")
         async def read_image():
@@ -41,15 +49,22 @@ class MspaintWorkflow(WorkflowEntrypoint):
             }
 
         @step.do("generate_mspaint")
-        async def generate_mspaint(read_image):
+        async def generate_mspaint(read_image, load_config):
             image_data = read_image
+            config = load_config
             b64_string = base64.b64encode(image_data["bytes"]).decode("ascii")
             data_uri = f"data:{image_data['content_type']};base64,{b64_string}"
+
+            # Build prompt from base + optional additional instructions
+            prompt = BASE_PROMPT
+            additional = config.get("additionalInstructions")
+            if additional:
+                prompt = f"{prompt} {additional}"
 
             response = await env.AI.run(
                 "openai/gpt-image-2",
                 {
-                    "prompt": PROMPT,
+                    "prompt": prompt,
                     "images": [data_uri],
                 },
                 {
@@ -92,9 +107,9 @@ class MspaintWorkflow(WorkflowEntrypoint):
             # Convert using the same Uint8Array pattern as get_photo
             image_bytes = bytes(js.Uint8Array.new(buffer))
 
-            output_key = image_key.replace("photos/", "mspaintified/")
+            output_key = image_key.replace(f"{event_slug}/photos/", f"{event_slug}/mspaintified/")
             if output_key == image_key:
-                output_key = f"mspaintified/{image_key}"
+                output_key = f"{event_slug}/mspaintified/{image_key.split('/')[-1]}"
 
             await env.MY_BUCKET.put(
                 output_key,

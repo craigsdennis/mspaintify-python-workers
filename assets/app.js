@@ -1,3 +1,6 @@
+const urlParams = new URLSearchParams(window.location.search);
+const EVENT_SLUG = urlParams.get('event') || 'default';
+
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const video = document.getElementById('video');
@@ -57,7 +60,7 @@ async function uploadFile(file) {
   formData.append('file', file);
 
   try {
-    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    const res = await fetch(`/api/upload?event=${EVENT_SLUG}`, { method: 'POST', body: formData });
     const data = await res.json();
 
     if (!res.ok) {
@@ -121,7 +124,7 @@ refreshMspaintifiedBtn.addEventListener('click', loadMspaintified);
 async function loadGallery() {
   galleryGrid.innerHTML = '<p>Loading...</p>';
   try {
-    const res = await fetch('/api/photos');
+    const res = await fetch(`/api/photos?event=${EVENT_SLUG}`);
     const data = await res.json();
 
     if (!res.ok) {
@@ -160,7 +163,7 @@ async function loadGallery() {
 async function loadMspaintified() {
   mspaintifiedGrid.innerHTML = '<p>Loading...</p>';
   try {
-    const res = await fetch('/api/photos?prefix=mspaintified/');
+    const res = await fetch(`/api/photos?event=${EVENT_SLUG}&type=mspaintified`);
     const data = await res.json();
 
     if (!res.ok) {
@@ -223,7 +226,7 @@ async function mspaintify(key, itemEl) {
   btn.textContent = 'Processing...';
 
   try {
-    const res = await fetch(`/api/mspaintify/${key}`, { method: 'POST' });
+    const res = await fetch(`/api/mspaintify/${key}?event=${EVENT_SLUG}`, { method: 'POST' });
     const data = await res.json();
 
     if (!res.ok) {

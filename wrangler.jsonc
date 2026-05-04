@@ -17,6 +17,12 @@
 			"bucket_name": "mspaint-photos"
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "CONFIG",
+			"id": "b9eaed9dd0034933baeef02b17872923"
+		}
+	],
 	"ai": {
 		"binding": "AI"
 	},
