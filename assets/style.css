@@ -100,8 +100,8 @@ body.presenter {
 
 .qr-section {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  bottom: 150px;
+  left: 60px;
   z-index: 100;
   transition: all 0.5s ease;
 }
@@ -348,6 +348,12 @@ body.capture {
 }
 
 #video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   transform: scaleX(-1);
 }
 
@@ -356,13 +362,16 @@ body.capture {
 }
 
 .capture-overlay {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  min-height: 100dvh;
   padding: 30px 20px 40px;
   background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 20%, transparent 60%, rgba(0,0,0,0.7) 100%);
 }
@@ -588,7 +597,7 @@ body.capture {
 
 .progress-bar {
   position: sticky;
-  top: 20px;
+  top: 0;
   z-index: 100;
   width: 80%;
   max-width: 300px;
@@ -598,6 +607,8 @@ body.capture {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  margin: 10px 0;
+  flex-shrink: 0;
 }
 
 .progress-fill {
@@ -701,4 +712,30 @@ body.capture {
 /* Hide share button if not supported */
 .no-share .btn-share {
   display: none;
+}
+
+/* File upload fallback button */
+.upload-fallback-btn {
+  margin-top: 15px;
+}
+
+/* Learn more link in typewriter */
+.learn-more-link {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 8px 20px;
+  background: linear-gradient(45deg, var(--color-dark-orange), var(--color-orange));
+  color: var(--color-white);
+  font-family: var(--font-silly);
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  border: 3px solid var(--color-black);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px var(--color-yellow);
+  transition: transform 0.1s;
+}
+
+.learn-more-link:active {
+  transform: scale(0.95);
 }

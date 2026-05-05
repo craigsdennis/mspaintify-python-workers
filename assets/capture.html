@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>MSPaintify</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127912;</text></svg>">
   <link rel="stylesheet" href="/style.css">
@@ -12,8 +13,9 @@
   <div class="capture-container">
     <!-- Camera View -->
     <div class="camera-view" id="cameraView">
-      <video id="video" autoplay playsinline></video>
+      <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas" hidden></canvas>
+      <input type="file" id="fileInput" accept="image/*" capture="user" hidden>
       
       <div class="capture-overlay">
         <div class="capture-header">
@@ -53,11 +55,11 @@
     <div class="processing-view hidden" id="processingView">
       <div class="processing-content">
         <h2>MSPaintify</h2>
-        <div class="typewriter-container" id="typewriterContainer">
-          <!-- Lines get appended here -->
-        </div>
         <div class="progress-bar">
           <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="typewriter-container" id="typewriterContainer">
+          <!-- Lines get appended here -->
         </div>
       </div>
     </div>

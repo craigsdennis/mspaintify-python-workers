@@ -29,6 +29,7 @@ const againBtn = document.getElementById('againBtn');
 const errorView = document.getElementById('errorView');
 const errorText = document.getElementById('errorText');
 const retryBtn = document.getElementById('retryBtn');
+const fileInput = document.getElementById('fileInput');
 const pageTitle = document.querySelector('title');
 const captureHeaderH2 = document.querySelector('.capture-header h2');
 const captureHeaderP = document.querySelector('.capture-header p');
@@ -45,6 +46,9 @@ const SELLING_POINTS = [
   "You just deploy to region:earth...",
   "Python Workers are powered by Pyodide, compiling Python to WebAssembly...",
   "That means you can write Python that executes in 300+ cities worldwide!",
+  "Workers KV is a global, low-latency key-value data store...",
+  "It supports high read volumes with low latency across our entire network...",
+  "We use it to store event configs that replicate instantly worldwide...",
   "We're using Python Workflows, a brand new primitive...",
   "Workflows give you durable execution with automatic retries...",
   "Each step in the DAG can run for up to 15 minutes!",
@@ -84,8 +88,12 @@ async function startCamera() {
       video: { facingMode: 'user' }
     });
     video.srcObject = stream;
+    // Explicit play() for Firefox compatibility
+    await video.play();
   } catch (err) {
-    showError('Could not access camera: ' + err.message);
+    console.error('Camera error:', err);
+    // Fallback: show file picker on camera failure (Firefox permission denial, etc.)
+    showCameraFallback('Could not access camera: ' + err.message);
   }
 }
 
@@ -143,7 +151,18 @@ function startTypewriter() {
       // Continue typing this message
       typewriterTimeout = setTimeout(typeNextChar, 30);
     } else {
-      // Finished this message, start next after pause
+      // Finished this message
+      if (message === 'Almost done... ✨') {
+        const link = document.createElement('a');
+        link.href = 'https://workers.cloudflare.com';
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = 'Learn more →';
+        link.className = 'learn-more-link';
+        typewriterContainer.appendChild(link);
+        typewriterContainer.scrollTop = typewriterContainer.scrollHeight;
+      }
+      // start next after pause
       charIndex = 0;
       messageIndex++;
       typewriterTimeout = setTimeout(typeNextChar, 1500);
@@ -230,12 +249,12 @@ async function pollWorkflow(originalKey) {
       }
     }, 2500);
 
-    // Timeout after 2 minutes
+    // Timeout after 3 minutes
     setTimeout(() => {
       clearInterval(interval);
       stopTypewriter();
       reject(new Error('Taking too long... Check the big screen later!'));
-    }, 120000);
+    }, 180000);
   });
 }
 
@@ -313,6 +332,49 @@ function showError(msg) {
   errorView.classList.remove('hidden');
   errorText.textContent = msg;
 }
+
+// Show camera fallback with file upload option (for Firefox permission denial, etc.)
+function showCameraFallback(msg) {
+  stopCamera();
+  processingView.classList.add('hidden');
+  previewView.classList.add('hidden');
+  errorView.classList.remove('hidden');
+  errorText.innerHTML = msg + '<br><br><strong>Or upload a photo instead:</strong>';
+
+  // Show file picker button
+  const uploadBtn = document.createElement('button');
+  uploadBtn.textContent = '📁 Choose Photo';
+  uploadBtn.className = 'btn-again';
+  uploadBtn.style.marginTop = '15px';
+  uploadBtn.onclick = () => fileInput.click();
+
+  // Replace retry button with upload button, keep both
+  const existingUpload = errorView.querySelector('.upload-fallback-btn');
+  if (existingUpload) existingUpload.remove();
+  uploadBtn.classList.add('upload-fallback-btn');
+  errorView.querySelector('.error-content').appendChild(uploadBtn);
+}
+
+// Handle file upload fallback
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    previewImg.src = ev.target.result;
+    capturedBlob = file;
+
+    // Hide error, show preview
+    errorView.classList.add('hidden');
+    previewView.classList.remove('hidden');
+
+    // Clean up upload button
+    const uploadBtn = errorView.querySelector('.upload-fallback-btn');
+    if (uploadBtn) uploadBtn.remove();
+  };
+  reader.readAsDataURL(file);
+});
 
 // Reset to camera
 function reset() {

@@ -50,6 +50,14 @@ async function initEvent() {
   }
 
   initQR();
+
+  // Make QR section clickable to open capture page
+  qrSection.style.cursor = 'pointer';
+  qrSection.addEventListener('click', () => {
+    const captureUrl = `${window.location.origin}/capture.html?event=${EVENT_SLUG}`;
+    window.open(captureUrl, '_blank');
+  });
+
   pollPhotos();
   setInterval(pollPhotos, POLL_INTERVAL);
 }
