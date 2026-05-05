@@ -12,12 +12,13 @@
   <div class="presenter-container">
     <header class="presenter-header">
       <h1>MSPaintify</h1>
-      <div class="counter">
-        <span id="photoCount">0</span> photos slopped
-      </div>
     </header>
 
     <div class="qr-section">
+      <div class="qr-pointer">
+        <span class="qr-pointer-arrow">→</span>
+        <span class="qr-pointer-text">Scan to get your selfie mspaintified</span>
+      </div>
       <div class="qr-box">
         <div id="qrcode"></div>
         <p class="qr-label">MSPaintify yourself!</p>
@@ -44,10 +45,18 @@
       </div>
     </div>
 
-    <div class="status-bar" id="statusBar">
-      <span class="status-dot"></span>
-      <span id="statusText">Waiting for photos...</span>
-    </div>
+    <footer class="site-footer">
+      <p class="footer-line">
+        Built with 🧡 100% on Cloudflare — 
+        <a href="https://developers.cloudflare.com/workers/languages/python/" target="_blank" rel="noopener">Python Workers</a> &amp;&amp; 
+        <a href="https://developers.cloudflare.com/r2/" target="_blank" rel="noopener">R2</a> &amp;&amp; 
+        <a href="https://developers.cloudflare.com/workflows/python/" target="_blank" rel="noopener">Workflows</a> &amp;&amp; 
+        <a href="https://developers.cloudflare.com/ai/models/openai/gpt-image-2/" target="_blank" rel="noopener">AI Gateway</a>
+      </p>
+      <p class="footer-line">
+        <a href="https://github.com/craigsdennis/mspaintify-python-workers" target="_blank" rel="noopener">👀 the code</a>
+      </p>
+    </footer>
   </div>
 
   <script src="/presenter.js"></script>

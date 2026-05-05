@@ -21,8 +21,6 @@ const slideshowPair = document.getElementById('slideshowPair');
 const slideshowEmpty = document.getElementById('slideshowEmpty');
 const beforeImg = document.getElementById('beforeImg');
 const afterImg = document.getElementById('afterImg');
-const photoCount = document.getElementById('photoCount');
-const statusText = document.getElementById('statusText');
 const pageTitle = document.querySelector('title');
 const pageHeader = document.querySelector('.presenter-header h1');
 const qrLabel = document.querySelector('.qr-label');
@@ -94,9 +92,6 @@ async function pollPhotos() {
         slideshowEmpty.classList.add('hidden');
         startSlideshow();
       }
-
-      photoCount.textContent = mspaintifiedPhotos.length;
-      statusText.textContent = `${mspaintifiedPhotos.length} photos slopped`;
     }
   } catch (err) {
     console.error('Poll error:', err);

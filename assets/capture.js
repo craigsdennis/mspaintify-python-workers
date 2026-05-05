@@ -89,6 +89,15 @@ async function startCamera() {
   }
 }
 
+// Stop camera and release resources
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+    video.srcObject = null;
+  }
+}
+
 // Take photo
 function capturePhoto() {
   canvas.width = video.videoWidth;
@@ -99,6 +108,7 @@ function capturePhoto() {
     capturedBlob = blob;
     previewImg.src = canvas.toDataURL('image/jpeg');
 
+    stopCamera();
     cameraView.classList.add('hidden');
     previewView.classList.remove('hidden');
   }, 'image/jpeg', 0.9);
@@ -278,6 +288,10 @@ async function sharePhotos() {
     if (navigator.canShare(shareData)) {
       await navigator.share(shareData);
       shareBtn.textContent = '✅ Shared!';
+      setTimeout(() => {
+        shareBtn.disabled = false;
+        shareBtn.textContent = '📤 Share My Slop';
+      }, 2000);
     } else {
       alert('Sharing files not supported on this device');
       shareBtn.disabled = false;
@@ -293,6 +307,7 @@ async function sharePhotos() {
 
 // Show error
 function showError(msg) {
+  stopCamera();
   processingView.classList.add('hidden');
   previewView.classList.add('hidden');
   errorView.classList.remove('hidden');
