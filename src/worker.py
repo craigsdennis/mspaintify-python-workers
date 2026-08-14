@@ -119,6 +119,7 @@ async def get_photo(request: Request, key: str):
     js_headers = js.Headers.new()
     obj.writeHttpMetadata(js_headers)
     js_headers.set("etag", obj.httpEtag)
+    js_headers.set("Cache-Control", "public, max-age=31536000, immutable")
 
     # Read full body and convert JS ArrayBuffer to Python bytes
     body_buffer = await obj.arrayBuffer()
