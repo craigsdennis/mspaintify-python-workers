@@ -1,6 +1,6 @@
 # MSPaintify
 
-[<img src="https://img.youtube.com/vi/cB9QzDCs6RQ/0.jpg">](https://youtu.be/cB9QzDCs6RQ "Run Python on Cloudflare's planetary network")
+[<img src="https://img.youtube.com/vi/-shGzWRd5g4/0.jpg">](https://youtu.be/-shGzWRd5g4 "Run Python on Cloudflare's planetary network")
 
 A Cloudflare Python Worker that turns photos into delightfully terrible MS Paint-style drawings using OpenAI's GPT-Image-2 via AI Gateway.
 
